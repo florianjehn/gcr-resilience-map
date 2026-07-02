@@ -332,7 +332,7 @@ chip(0.035, 0.010, 0.93, 0.092, FOOT_BG)
 ax.text(
     0.5,
     0.075,
-    "Australia & New Zealand fare best across scenarios",
+    "Australia fares best across scenarios",
     ha="center",
     va="center",
     fontsize=5.4,
@@ -342,7 +342,7 @@ ax.text(
 ax.text(
     0.5,
     0.038,
-    "— yet stay vulnerable, especially without global cooperation & trade",
+    "— yet stays vulnerable, especially without global cooperation & trade",
     ha="center",
     va="center",
     fontsize=4.3,

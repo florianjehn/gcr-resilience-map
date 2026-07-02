@@ -6,7 +6,10 @@ Creates:
 """
 
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as pe
 import geopandas as gpd
+from shapely.geometry import Point
+from shapely.ops import nearest_points
 import warnings
 
 # Apply ALLFED style
@@ -69,6 +72,15 @@ class WorldMap:
 
         return matched.index
 
+    # Small countries that are hard to spot on the map and get a text label.
+    # Each maps to an (dx, dy) offset (in Winkel Tripel map units) that places the
+    # label over open ocean so it never overlaps the country or its neighbours.
+    HIGHLIGHT_LABELS = {
+        "Uruguay": (2.6e6, -1.8e6),
+        "Switzerland": (-1.8e6, 2.2e6),
+        "Taiwan": (2.4e6, 0.9e6),
+    }
+
     def plot_single(self, ax, countries, color):
         """
         Plot a single map on a given axes.
@@ -93,7 +105,38 @@ class WorldMap:
         self.world.plot(ax=ax, color=colors, edgecolor=self.border_color, linewidth=0.3)
 
         self.border.plot(ax=ax, edgecolor="black", linewidth=0.5, facecolor="none")
+
+        self._label_countries(ax, idx, color)
         ax.set_axis_off()
+
+    def _label_countries(self, ax, idx, color):
+        """Label small highlighted countries with a leader line to their border.
+
+        Only countries that are actually highlighted (in ``idx``) are labelled.
+        """
+        highlighted = self.world.loc[idx]
+        labels = highlighted[highlighted["NAME"].isin(self.HIGHLIGHT_LABELS)]
+        for _, row in labels.iterrows():
+            dx, dy = self.HIGHLIGHT_LABELS[row["NAME"]]
+            rep = row.geometry.representative_point()
+            label_x, label_y = rep.x + dx, rep.y + dy
+
+            # Anchor the leader line on the country border nearest the label.
+            anchor, _ = nearest_points(
+                row.geometry.boundary, Point(label_x, label_y)
+            )
+            ax.annotate(
+                row["NAME"],
+                xy=(anchor.x, anchor.y),
+                xytext=(label_x, label_y),
+                ha="center",
+                va="center",
+                fontsize=8,
+                fontweight="bold",
+                color=color,
+                arrowprops=dict(arrowstyle="-", color="black", linewidth=0.6),
+                path_effects=[pe.withStroke(linewidth=2, foreground="white")],
+            )
 
     def plot_stacked(self, categories, figsize=(10, 14)):
         """
