@@ -26,7 +26,7 @@ plt.style.use(
     "https://raw.githubusercontent.com/allfed/ALLFED-matplotlib-style-sheet/main/ALLFED.mplstyle"
 )
 
-LEDGER_PATH = "results/Data/gcr_resilience_evidence_ledger.xlsx"
+LEDGER_PATH = "results/Data/gcr_resilience_vulnerability_evidence_ledger.xlsx"
 FIGURE_DIR = "results/figures"
 
 # Region entries in the ledger expanded onto the constituent countries that are
